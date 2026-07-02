@@ -2,100 +2,90 @@ pipeline {
     agent any
 
     environment {
-        // Change these variables to match your Docker Registry configuration
-        DOCKER_REGISTRY_USER = 'your_dockerhub_username'
-        BACKEND_IMAGE_NAME   = 'guardianai-backend'
-        FRONTEND_IMAGE_NAME  = 'guardianai-frontend'
-        IMAGE_TAG            = "${BUILD_NUMBER}"
+        GITHUB_REPO = 'https://github.com/Yokesh333/Toxic_comment_classification.git'
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Source') {
             steps {
-                echo 'Checking out source code...'
-                checkout scm
+                echo 'Cloning GitHub Repository...'
+
+                git branch: 'main',
+                    credentialsId: 'github-token',
+                    url: "${GITHUB_REPO}"
             }
         }
 
-        stage('Verify Environments') {
+        stage('Verify Environment') {
             steps {
-                echo 'Verifying docker and docker-compose tools...'
+                echo 'Checking Docker installation...'
                 sh 'docker --version'
-                sh 'docker-compose --version'
+
+                echo 'Checking Docker Compose installation...'
+                sh 'docker compose version || docker-compose --version'
             }
         }
 
-        stage('Build Backend') {
+        stage('Build Backend Image') {
             steps {
-                echo 'Building Backend Docker Image...'
                 dir('backend') {
-                    sh "docker build -t ${DOCKER_REGISTRY_USER}/${BACKEND_IMAGE_NAME}:${IMAGE_TAG} -t ${DOCKER_REGISTRY_USER}/${BACKEND_IMAGE_NAME}:latest ."
+                    sh '''
+                    docker build \
+                    -t guardianai-backend:latest \
+                    .
+                    '''
                 }
             }
         }
 
-        stage('Build Frontend') {
+        stage('Build Frontend Image') {
             steps {
-                echo 'Building Frontend Docker Image...'
                 dir('frontend') {
-                    sh "docker build -t ${DOCKER_REGISTRY_USER}/${FRONTEND_IMAGE_NAME}:${IMAGE_TAG} -t ${DOCKER_REGISTRY_USER}/${FRONTEND_IMAGE_NAME}:latest ."
+                    sh '''
+                    docker build \
+                    -t guardianai-frontend:latest \
+                    .
+                    '''
                 }
             }
         }
 
-        stage('Integration Testing') {
+        stage('Integration Test') {
             steps {
-                echo 'Starting containers to run API Integration tests...'
-                // Spin up the backend and frontend using docker-compose
-                sh 'docker-compose up --build -d'
-                
-                // Allow some time for model initialization
-                sleep time: 10, unit: 'SECONDS'
-                
-                // Check if backend API answers health check successfully
-                sh 'curl -f http://localhost:8000/api/health'
-                
-                // Tear down integration test environment
-                sh 'docker-compose down'
-            }
-        }
+                echo 'Starting application using Docker Compose...'
 
-        stage('Push Images') {
-            /* 
-               Uncomment this stage after configuring Jenkins Credentials 
-               with ID 'dockerhub-credentials' for pushing to Docker Hub.
-            */
-            /*
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
-                    sh "echo ${PASSWORD} | docker login -u ${USER} --password-stdin"
-                    
-                    echo 'Pushing Backend Image...'
-                    sh "docker push ${DOCKER_REGISTRY_USER}/${BACKEND_IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker push ${DOCKER_REGISTRY_USER}/${BACKEND_IMAGE_NAME}:latest"
-                    
-                    echo 'Pushing Frontend Image...'
-                    sh "docker push ${DOCKER_REGISTRY_USER}/${FRONTEND_IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker push ${DOCKER_REGISTRY_USER}/${FRONTEND_IMAGE_NAME}:latest"
-                }
-            }
-            */
-            steps {
-                echo 'Skipping image push stage (configure credentials to enable).'
+                sh '''
+                docker compose up --build -d || docker-compose up --build -d
+                '''
+
+                sleep(time: 15, unit: 'SECONDS')
+
+                sh '''
+                curl -f http://localhost:8000/api/health
+                '''
+
+                echo 'Integration Test Passed'
             }
         }
     }
 
     post {
+
         always {
-            echo 'Pipeline execution complete. Cleaning up unused Docker networks and containers...'
-            sh 'docker-compose down --remove-orphans || true'
+            echo 'Cleaning up containers...'
+
+            sh '''
+            docker compose down --remove-orphans || docker-compose down --remove-orphans || true
+            '''
         }
+
         success {
-            echo 'CI/CD pipeline completed successfully!'
+            echo 'Pipeline completed successfully.'
         }
+
         failure {
-            echo 'Pipeline failed. Please check build logs for errors.'
+            echo 'Pipeline failed. Check the console logs.'
         }
     }
 }
