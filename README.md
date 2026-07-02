@@ -69,6 +69,9 @@ If you do not have the model weights inside a `best_model` folder:
 4. Ensure the directory contains `config.json`, `model.safetensors`, and tokenizer files.
 
 ### 2. Start the Backend API Server
+You can run the backend server using one of these options:
+
+#### Option A: Local Python Environment
 1. Navigate to the `backend/` directory:
    ```bash
    cd backend
@@ -89,12 +92,30 @@ If you do not have the model weights inside a `best_model` folder:
    ```bash
    python app.py
    ```
-   *The backend will run on [http://127.0.0.1:8000](http://127.0.0.1:8000). During startup, it will preload the model weights into CPU/GPU memory.*
+   *The backend will run on [http://127.0.0.1:8000](http://127.0.0.1:8000).*
+
+#### Option B: Docker Container (Volume Mounted Weights)
+We have included a Dockerfile in the `backend/` folder. Since the model weights are very large, they are excluded from the image build. You should bind-mount them from your host computer during container startup:
+
+1. Build the backend image (optimized for CPU to keep the size small):
+   ```bash
+   cd backend
+   docker build -t guardianai-backend .
+   ```
+2. Run the container and mount your local `best_model` folder (replace `C:/absolute/path/to/best_model` with the absolute path on your host):
+   ```bash
+   # On Windows (PowerShell):
+   docker run -d -p 8000:8000 -v "C:/absolute/path/to/best_model:/app/best_model" guardianai-backend
+
+   # On Mac/Linux:
+   docker run -d -p 8000:8000 -v "$(pwd)/best_model:/app/best_model" guardianai-backend
+   ```
+
 
 ### 3. Load the Frontend UI
 Since the frontend is built using standard Vanilla HTML, CSS, and JS:
-- Simply double-click the [index.html](file:///c:/Users/Yokesh/Downloads/Toxic%20comment/frontend/index.html) file to open it in your web browser.
-- Alternatively, serve it locally from the `frontend/` directory:
+- **Option A (Direct File)**: Simply double-click the [index.html](file:///c:/Users/Yokesh/Downloads/Toxic%20comment/frontend/index.html) file to open it in your web browser.
+- **Option B (Local CLI Server)**: Serve it locally from the `frontend/` directory:
   ```bash
   cd frontend
   # Using Python:
@@ -102,7 +123,27 @@ Since the frontend is built using standard Vanilla HTML, CSS, and JS:
   # Using Node:
   npx serve
   ```
-  Open the browser to the designated port (e.g. `http://localhost:3000`).
+- **Option C (Docker Container)**: Build and run the lightweight Nginx image:
+  ```bash
+  cd frontend
+  docker build -t guardianai-frontend .
+  docker run -d -p 3000:80 guardianai-frontend
+  ```
+  Open the browser to **http://localhost:3000**.
+
+### 4. Run Both Services using Docker Compose (Recommended)
+You can build and start both the frontend and backend services with a single command:
+
+1. Ensure your model weights folder `best_model/` is located in the project root directory.
+2. Build and start the services in background mode:
+   ```bash
+   docker-compose up --build -d
+   ```
+3. Open your browser to **http://localhost:3000** to use the application. The backend API is automatically exposed on **http://localhost:8000**.
+4. To stop the containers:
+   ```bash
+   docker-compose down
+   ```
 
 ---
 

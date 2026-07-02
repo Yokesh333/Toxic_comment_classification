@@ -1,0 +1,16 @@
+# Ignore virtual environments
+venv/
+.venv/
+env/
+
+# Ignore Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Exclude large model weights from build context (we will volume mount them instead)
+best_model/
+*.zip
+*.tar.gz
