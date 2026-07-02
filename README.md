@@ -161,3 +161,13 @@ You can build and start both the frontend and backend services with a single com
     "identity_hate": { "probability": 0.0004, "flagged": false }
   }
   ```
+
+---
+
+## 🚀 CI/CD Pipeline (Jenkins)
+
+We have included a declarative pipeline **[Jenkinsfile](file:///c:/Users/Yokesh/Downloads/Toxic%20comment/Jenkinsfile)** in the project root to automate build and delivery:
+1. **Verification**: Assures `docker` and `docker-compose` run on the target agent.
+2. **Build**: Compiles backend and frontend docker images (tagging with standard build numbers).
+3. **Integration Testing**: Orchestrates local compose initialization, waits for BERT pre-loading sequence, runs integration queries against `/api/health`, and tears down containers.
+4. **Image Delivery**: Preconfigured stage (commented out) to log in and push built images to Docker Hub.
