@@ -12,7 +12,6 @@ pipeline {
                 echo 'Cloning GitHub Repository...'
 
                 git branch: 'main',
-                    credentialsId: 'github-token',
                     url: "${GITHUB_REPO}"
             }
         }
