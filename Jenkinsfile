@@ -65,13 +65,15 @@ pipeline {
                 fi
 
                 echo "Waiting for backend to start and load model..."
-                for i in {1..20}; do
+                i=1
+                while [ $i -le 20 ]; do
                     echo "Checking backend health (attempt $i)..."
                     if $COMPOSE_CMD exec -T backend python -c "import urllib.request, json, sys; res = urllib.request.urlopen('http://localhost:8000/api/health', timeout=5); data = json.loads(res.read().decode()); sys.exit(0 if data.get('status') == 'online' else 1)" >/dev/null 2>&1; then
                         echo "Backend is healthy!"
                         exit 0
                     fi
                     sleep 5
+                    i=$((i+1))
                 done
                 echo "Error: Backend failed to respond to health check after 100 seconds."
                 exit 1
