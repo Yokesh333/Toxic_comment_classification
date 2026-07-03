@@ -86,20 +86,15 @@ pipeline {
 
     post {
 
-        always {
-            echo 'Cleaning up containers...'
-
-            sh '''
-            docker compose down --remove-orphans || docker-compose down --remove-orphans || true
-            '''
-        }
-
         success {
             echo 'Pipeline completed successfully.'
         }
 
         failure {
-            echo 'Pipeline failed. Check the console logs.'
+            echo 'Pipeline failed. Check the console logs. Cleaning up containers...'
+            sh '''
+            docker compose down --remove-orphans || docker-compose down --remove-orphans || true
+            '''
         }
     }
 }
