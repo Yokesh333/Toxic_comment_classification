@@ -99,6 +99,22 @@ pipeline {
                 exit 1
                 '''
 
+                sh '''
+                COMPOSE_CMD="docker compose"
+                if ! docker compose version >/dev/null 2>&1; then
+                    if docker-compose --version >/dev/null 2>&1; then
+                        COMPOSE_CMD="docker-compose"
+                    else
+                        COMPOSE_CMD="./docker-compose"
+                    fi
+                fi
+                echo "=== Files in Backend Model Directory ==="
+                $COMPOSE_CMD exec -T backend ls -la /app/best_model || true
+                echo "=== Backend Container Logs ==="
+                $COMPOSE_CMD logs backend
+                echo "=== End Backend Logs ==="
+                '''
+
                 echo 'Integration Test Passed'
             }
         }
