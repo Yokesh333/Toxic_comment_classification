@@ -1,5 +1,5 @@
 // Configuration
-const API_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+const API_URL = window.location.origin;
 
 // DOM Elements - Inputs
 const commentInput = document.getElementById("comment-input");
