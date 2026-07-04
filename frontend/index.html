@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GuardianAI - Toxicity Analysis Engine</title>
-    
+
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Lucide Icons (CDN) -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <!-- Custom Style -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="glass-bg-blobs">
         <div class="blob blob-indigo"></div>
         <div class="blob blob-rose"></div>
     </div>
-    
+
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
@@ -30,7 +33,8 @@
                 <span class="brand-name">GuardianAI</span>
             </div>
             <h1>BERT-Powered Multi-Label Toxicity Classifier</h1>
-            <p class="subtitle">Deep learning text classification framework for moderating online discussions in real-time.</p>
+            <p class="subtitle">Deep learning text classification framework for moderating online discussions in
+                real-time.</p>
         </header>
 
         <!-- Main Dashboard -->
@@ -40,14 +44,11 @@
                 <h2 class="card-title">
                     <i data-lucide="text-quote"></i> Analyze Text
                 </h2>
-                
+
                 <div class="form-group">
                     <label for="comment-input">Enter Comment or Article Segment</label>
-                    <textarea 
-                        id="comment-input" 
-                        placeholder="Type or paste text content here to analyze toxic traits..."
-                        rows="7"
-                    ></textarea>
+                    <textarea id="comment-input"
+                        placeholder="Type or paste text content here to analyze toxic traits..." rows="7"></textarea>
                     <div class="textarea-footer">
                         <span id="char-counter">0 characters</span>
                         <button id="clear-btn" class="text-btn">
@@ -61,14 +62,7 @@
                         <label for="threshold-slider">Flagging Sensitivity Threshold</label>
                         <span id="threshold-val">0.40</span>
                     </div>
-                    <input 
-                        type="range" 
-                        id="threshold-slider" 
-                        min="0.10" 
-                        max="0.90" 
-                        value="0.40" 
-                        step="0.05"
-                    >
+                    <input type="range" id="threshold-slider" min="0.10" max="0.90" value="0.40" step="0.05">
                     <div class="slider-footer">
                         <span>Strict Flagging</span>
                         <span>Lenient Flagging</span>
@@ -78,18 +72,21 @@
                 <button id="analyze-btn" class="btn btn-primary">
                     <i data-lucide="zap"></i> Analyze Comment
                 </button>
-                
+
                 <!-- Quick samples -->
                 <div class="samples-section">
                     <h3>Quick Samples</h3>
                     <div class="samples-grid">
-                        <button class="sample-chip" data-text="This is an incredibly helpful and well-structured response! Thank you.">
+                        <button class="sample-chip"
+                            data-text="This is an incredibly helpful and well-structured response! Thank you.">
                             🟢 Safe Comment
                         </button>
-                        <button class="sample-chip" data-text="Shut up you absolute idiot, nobody wants to read your garbage opinions.">
+                        <button class="sample-chip"
+                            data-text="Shut up you absolute idiot, nobody wants to read your garbage opinions.">
                             🔴 Obscene & Insult
                         </button>
-                        <button class="sample-chip" data-text="I will track down where you live and make sure you pay for this.">
+                        <button class="sample-chip"
+                            data-text="I will track down where you live and make sure you pay for this.">
                             🚨 Threatening
                         </button>
                     </div>
@@ -224,6 +221,7 @@
         lucide.createIcons();
     </script>
     <!-- Custom Logic Script -->
-    <script src="app.js"></script>
+    <script src="app.js?v=1.0.1"></script>
 </body>
+
 </html>
