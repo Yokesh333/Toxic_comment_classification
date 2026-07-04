@@ -52,7 +52,11 @@ class ToxicClassifier:
             
         # Load configuration and tokenizer
         config = BertConfig.from_pretrained(self.model_dir, num_labels=len(LABELS))
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_dir, use_fast=True)
+        try:
+            self.tokenizer = AutoTokenizer.from_pretrained(self.model_dir, use_fast=True)
+        except Exception as e:
+            print(f"Warning: Failed to load tokenizer from {self.model_dir}: {e}. Falling back to 'bert-base-uncased'...")
+            self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased", use_fast=True)
         
         # Create model architecture (empty weights)
         self.model = BertForMultiLabelClassification(config)
