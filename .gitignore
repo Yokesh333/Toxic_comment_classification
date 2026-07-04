@@ -7,7 +7,11 @@ __pycache__/
 .pytest_cache/
 
 # Large Model Weights (exceeds GitHub limits)
-best_model/
+**/best_model/*.safetensors
+**/best_model/*.bin
+**/best_model/*.h5
+**/best_model/*.ot
+**/best_model/*.pt
 results/
 *.zip
 

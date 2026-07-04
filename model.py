@@ -46,7 +46,7 @@ class ToxicClassifier:
             
         # Load configuration and tokenizer
         config = BertConfig.from_pretrained(self.model_dir, num_labels=len(LABELS))
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_dir)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_dir, use_fast=True)
         
         # Create model architecture (empty weights)
         self.model = BertForMultiLabelClassification(config)
