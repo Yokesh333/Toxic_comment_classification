@@ -22,7 +22,25 @@ pipeline {
                 sh 'docker --version'
 
                 echo 'Checking Docker Compose installation...'
-                sh 'docker compose version || docker-compose --version'
+                sh '''
+                if docker compose version >/dev/null 2>&1; then
+                    echo "docker compose is available"
+                elif docker-compose --version >/dev/null 2>&1; then
+                    echo "docker-compose is available"
+                else
+                    echo "Docker Compose not found. Downloading standalone binary..."
+                    if command -v curl >/dev/null 2>&1; then
+                        curl -SL "https://github.com/docker/compose/releases/download/v2.29.1/docker-compose-linux-x86_64" -o ./docker-compose
+                    elif command -v wget >/dev/null 2>&1; then
+                        wget -q "https://github.com/docker/compose/releases/download/v2.29.1/docker-compose-linux-x86_64" -O ./docker-compose
+                    else
+                        echo "Error: Neither curl nor wget found to download docker-compose."
+                        exit 1
+                    fi
+                    chmod +x ./docker-compose
+                    ./docker-compose version
+                fi
+                '''
             }
         }
 
@@ -55,14 +73,16 @@ pipeline {
                 echo 'Starting application using Docker Compose...'
 
                 sh '''
-                docker compose up --build -d || docker-compose up --build -d
-                '''
-
-                sh '''
                 COMPOSE_CMD="docker compose"
                 if ! docker compose version >/dev/null 2>&1; then
-                    COMPOSE_CMD="docker-compose"
+                    if docker-compose --version >/dev/null 2>&1; then
+                        COMPOSE_CMD="docker-compose"
+                    else
+                        COMPOSE_CMD="./docker-compose"
+                    fi
                 fi
+
+                $COMPOSE_CMD up --build -d
 
                 echo "Waiting for backend to start and load model..."
                 i=1
@@ -93,7 +113,15 @@ pipeline {
         failure {
             echo 'Pipeline failed. Check the console logs. Cleaning up containers...'
             sh '''
-            docker compose down --remove-orphans || docker-compose down --remove-orphans || true
+            COMPOSE_CMD="docker compose"
+            if ! docker compose version >/dev/null 2>&1; then
+                if docker-compose --version >/dev/null 2>&1; then
+                    COMPOSE_CMD="docker-compose"
+                else
+                    COMPOSE_CMD="./docker-compose"
+                fi
+            fi
+            $COMPOSE_CMD down --remove-orphans || true
             '''
         }
     }
