@@ -50,33 +50,10 @@ class ToxicClassifier:
                 f"zip file into the 'best_model' folder at the root of the project."
             )
             
-        # Load configuration and tokenizer
-        config = BertConfig.from_pretrained(self.model_dir, num_labels=len(LABELS))
-        try:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_dir, use_fast=True)
-        except Exception as e:
-            print(f"Warning: Failed to load tokenizer from {self.model_dir}: {e}. Falling back to 'bert-base-uncased'...")
-            self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased", use_fast=True)
-        
-        # Create model architecture (empty weights)
-        self.model = BertForMultiLabelClassification(config)
-        
-        # Load weights manually from safetensors to minimize memory usage
-        safetensors_path = os.path.join(self.model_dir, "model.safetensors")
-        if os.path.exists(safetensors_path):
-            from safetensors.torch import load_file
-            state_dict = load_file(safetensors_path, device="cpu")
-            self.model.load_state_dict(state_dict, strict=False)
-            del state_dict  # Free memory immediately
-        else:
-            # Fallback: try pytorch bin format
-            bin_path = os.path.join(self.model_dir, "pytorch_model.bin")
-            state_dict = torch.load(bin_path, map_location="cpu")
-            self.model.load_state_dict(state_dict, strict=False)
-            del state_dict
-        
-        import gc
-        gc.collect()
+        # Load configuration, tokenizer and model using Hugging Face Auto classes
+        from transformers import AutoModelForSequenceClassification
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_dir)
+        self.model = AutoModelForSequenceClassification.from_pretrained(self.model_dir)
         
         self.model.to(self.device)
         self.model.eval()
