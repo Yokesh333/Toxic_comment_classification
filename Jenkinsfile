@@ -41,6 +41,31 @@ pipeline {
                     ./docker-compose version
                 fi
                 '''
+
+                echo 'Checking Model Weights...'
+                sh '''
+                mkdir -p ./best_model
+                if [ ! -f ./best_model/model.safetensors ]; then
+                    echo "Model weights (model.safetensors) missing from workspace."
+                    if [ -n "${MODEL_URL}" ]; then
+                        echo "Downloading model weights from ${MODEL_URL}..."
+                        if command -v curl >/dev/null 2>&1; then
+                            curl -SL "${MODEL_URL}" -o ./best_model/model.safetensors
+                        elif command -v wget >/dev/null 2>&1; then
+                            wget -q "${MODEL_URL}" -O ./best_model/model.safetensors
+                        else
+                            echo "Error: Neither curl nor wget found to download model weights."
+                            exit 1
+                        fi
+                    else
+                        echo "Error: model.safetensors is missing and the MODEL_URL environment variable is not set."
+                        echo "Please copy the weights file manually to the Jenkins agent, or configure MODEL_URL."
+                        exit 1
+                    fi
+                else
+                    echo "Model weights (model.safetensors) found."
+                fi
+                '''
             }
         }
 
