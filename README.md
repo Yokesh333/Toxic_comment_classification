@@ -1,6 +1,6 @@
-# GuardianAI - BERT Toxicity Classification Engine
+# SafeText AI – Intelligent Toxic Content Detection System
 
-GuardianAI is a deep learning multi-label classification framework powered by a fine-tuned **BERT-base-uncased** model. It predicts and flags toxicity across 6 distinct sub-classes: `toxic`, `severe_toxic`, `obscene`, `threat`, `insult`, and `identity_hate`.
+SafeText AI is a deep learning multi-label classification framework powered by a fine-tuned **BERT-base-uncased** model. It predicts and flags toxicity across 6 distinct sub-classes: `toxic`, `severe_toxic`, `obscene`, `threat`, `insult`, and `identity_hate`.
 
 This project is decoupled into a high-performance **FastAPI backend** and a premium, responsive **Vanilla HTML/CSS/JS frontend** using glassmorphic UI elements and micro-animations.
 
